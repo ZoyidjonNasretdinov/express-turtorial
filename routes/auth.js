@@ -18,7 +18,18 @@ router.get("/register", (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  console.log(req.body);
+  const existingUser = User.findOne({ email: req.body.email }) 
+  if(!existingUser) {
+    console.log('User not found');
+    return false;
+  }
+
+  const isPasswordCorrect = bcrypt.compare(req.body.password, existingUser.password)
+  if(!isPasswordCorrect) {
+    console.log("Password is wrong");
+    return false
+  }
+
   res.redirect('/')
 })
 
