@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import flash from "express-flash";
 import session from "express-session";
-import authRoutes from "./routes/auth.js";
+import authRoutes from "./routes/auth.js";  // Correct path to your route file
 
 dotenv.config();
 
@@ -26,7 +26,7 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(
   session({
-    secret: "Zoyidjon",
+    secret: process.env.SESSION_SECRET || "default_secret",
     resave: false,
     saveUninitialized: false,
   })
@@ -34,11 +34,12 @@ app.use(
 app.use(flash());
 
 // Routes
-app.use(authRoutes);
+app.use("/", authRoutes);  // This will handle all the routes in auth.js
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).send("Page not found");
+  console.error(`404 Error: ${req.originalUrl}`); // Log the error URL
+  res.status(404).render("404", { title: "Page Not Found" });
 });
 
 const PORT = process.env.PORT || 4100;
