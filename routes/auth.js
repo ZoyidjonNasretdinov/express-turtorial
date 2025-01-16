@@ -41,11 +41,10 @@ router.post("/login", async (req, res) => {
       return res.redirect("/login");
     }
 
-    // Generate token and send it as a cookie
     const token = generateAuthToken(user._id);
     res.cookie("auth_token", token, {
-      httpOnly: true, // Cookie is not accessible via JavaScript
-      secure: process.env.NODE_ENV === "production", // Only send secure cookies in production
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 3600000, // 1 hour expiry time
     });
 
@@ -74,7 +73,6 @@ router.post("/register", async (req, res) => {
       return res.redirect("/register");
     }
 
-    // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       firstName,
@@ -85,18 +83,15 @@ router.post("/register", async (req, res) => {
 
     await user.save();
 
-    // Generate token after successful registration
     const token = generateAuthToken(user._id);
-
-    // Send the token in a cookie
-    res.cookie("auth_token", token, { 
+    res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 3600000, // 1 hour expiry time
     });
 
     req.flash("success", "Registration successful");
-    res.redirect("/login"); // Redirect to login page after successful registration
+    res.redirect("/login");
   } catch (err) {
     console.error(err.message);
     req.flash("registerError", "Something went wrong");

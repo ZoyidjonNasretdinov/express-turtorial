@@ -4,7 +4,9 @@ import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import flash from "express-flash";
 import session from "express-session";
-import authRoutes from "./routes/auth.js";  // Correct path to your route file
+import authRoutes from "./routes/auth.js"; 
+import varMiddleware from './middleware/var.js' // Correct path to your route file
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -24,6 +26,7 @@ app.set("views", "./views");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(express.json());
+app.use(cookieParser())
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "default_secret",
@@ -32,7 +35,7 @@ app.use(
   })
 );
 app.use(flash());
-
+app.use(varMiddleware);  // This will add the isAuth variable to all routes
 // Routes
 app.use("/", authRoutes);  // This will handle all the routes in auth.js
 
