@@ -9,6 +9,10 @@ const router = express.Router();
 
 // Render login page
 router.get("/login", (req, res) => {
+  if(req.cookies.token) {
+    res.redirect('/');
+    return 
+  }
   res.render("login", {
     title: "Login",
     isLogin: true,
@@ -18,12 +22,21 @@ router.get("/login", (req, res) => {
 
 // Render register page
 router.get("/register", (req, res) => {
+  if(req.cookies.token) {
+    res.redirect('/')
+    return
+  }
   res.render("register", {
-    title: "Register",
+    title: "Register | Zoyidjon",
     isRegister: true,
     registerError: req.flash("registerError"),
   });
 });
+
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
+})
 
 // Handle login
 router.post("/login", async (req, res) => {

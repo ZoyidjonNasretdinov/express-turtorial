@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import flash from "express-flash";
 import session from "express-session";
 import authRoutes from "./routes/auth.js"; 
-import varMiddleware from './middleware/var.js' // Correct path to your route file
+import varMiddleware from './middleware/authMiddleware.js' // Correct path to your route file
 import cookieParser from "cookie-parser";
 
 dotenv.config();
