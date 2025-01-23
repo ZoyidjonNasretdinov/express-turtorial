@@ -4,7 +4,7 @@ const router = Router();
 
 
 router.get("/", (req, res) => {
-  res.render("index", {
+  req.render("index", {
     title: "Boom Shop | Zoyidjon",
     token : true,
   });
@@ -23,5 +23,9 @@ router.get("/add", (req, res) => {
     isAdd: true,
   });
 });
+
+router.post("/add-products", (req, res) => {
+  res.redirect("/products");
+}); 
 
 export default router;

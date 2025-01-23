@@ -1,1 +1,26 @@
-<h1>Add</h1>
+
+<div class="w-75 mx-auto">
+  <p class="fs-1">Add Product</p>
+  <form action="/add-products" method="get">
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="floatingInput" placeholder="Title" name="title" />
+      <label for="floatingInput">Title</label>
+    </div>
+    <div class="form-floating mb-3">
+      <textarea type="text" class="form-control" id="floatingTextarea2" placeholder="Description" name="description" />
+      <label for="floatingInput">Description</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="floatingImg" placeholder="Image url" name="image" />
+      <label for="floatingInput">Image</label>
+    </div>
+    <div class="input-group mt-3">
+      <span class="input-group-text bg-light">$</span>
+      <div class="form-floating">
+        <input type="number" class="form-control" id="floatingPrice" placeholder="Price" name="price" />
+        <label for="floatingPrice">Price</label>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Login</button>
+  </form>
+</div>
