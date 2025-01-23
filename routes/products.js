@@ -26,6 +26,14 @@ router.get("/products", async (req, res) => {
   });
 });
 
+router.get("/products/:id", async (req, res) => {
+  const product = await Product.findById(req.params.id).populate("user").lean();
+  res.render("product", {
+    title: `Product | ${product.title}`,
+    product : product,
+  });
+}
+
 router.get("/add", authMiddleware, (req, res) => {
   res.render("add", {
     title: "Add Product | Zoyidjon",
