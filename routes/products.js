@@ -6,12 +6,12 @@ import userMiddleware from "../middleware/user.js";
 const router = Router();
 
 
-router.get("/", async, (req, res) => {
+router.get("/", async (req, res) => {
   const products = await Product.find().lien();
   req.render("index", {
     title: "Boom Shop | Zoyidjon",
-    token : true,
-    products : products,
+    products : products.reverse(),
+    userId: req.userId ? req.userId.toString : null,
   });
 });
 

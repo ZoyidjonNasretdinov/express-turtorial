@@ -6,7 +6,9 @@ import flash from "express-flash";
 import session from "express-session";
 import authRoutes from "./routes/auth.js"; 
 import varMiddleware from './middleware/authMiddleware.js' // Correct path to your route file
+import userMiddleware from './middleware/userMiddleware.js' // Correct path to your route file
 import cookieParser from "cookie-parser";
+import hbsHelpers from "./utils/index.js";
 
 dotenv.config();
 
@@ -16,6 +18,7 @@ const app = express();
 const hbs = create({
   defaultLayout: "main",
   extname: "hbs",
+  helpers: hbsHelpers,
 });
 
 app.engine("hbs", hbs.engine);
@@ -36,6 +39,7 @@ app.use(
 );
 app.use(flash());
 app.use(varMiddleware);  // This will add the isAuth variable to all routes
+app.use(userMiddleware);  // This will add the userId variable to all routes
 // Routes
 app.use("/", authRoutes);  // This will handle all the routes in auth.js
 
