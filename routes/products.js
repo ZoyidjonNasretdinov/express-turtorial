@@ -24,7 +24,9 @@ router.get("/add", (req, res) => {
   });
 });
 
-router.post("/add-products", (req, res) => {
+router.post("/add-products", async (req, res) => {
+  const { title, description, image, price } = req.body;
+  const products = await Product.create(req.body);
   res.redirect("/products");
 }); 
 
