@@ -23,3 +23,14 @@
   background-position: center;
   background-size: cover;
 }
+
+.delete-btn {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.delete-btn:hover {
+  color: #fff;
+  cursor: pointer;
+}

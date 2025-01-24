@@ -72,4 +72,9 @@ router.post("/edit-products/:id", userMiddleware, async (req, res) => {
   res.redirect("/products");
 });
 
+router.post("/delete-products/:id", userMiddleware, async (req, res) => {
+  await Product.findByIdAndDelete(id);
+  res.redirect("/");
+});
+
 export default router;
