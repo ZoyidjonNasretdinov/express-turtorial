@@ -32,15 +32,23 @@ router.get("/products/:id", async (req, res) => {
     title: `Product | ${product.title}`,
     product : product,
   });
-}
+});
 
-router.get("/add", authMiddleware, (req, res) => {
+router.get('edit-products/:id', userMiddleware, async (req, res) => {
+  const product = await Product.findById(req.params.id).lean();
+  res.render("edit", {
+    title: `Edit Product | ${product.title}`,
+    product : product,
+  });
+});
+
+router.get("/add", authMiddleware, async (req, res) => {
   res.render("add", {
     title: "Add Product | Zoyidjon",
     isAdd: true,
     errorAddProducts: req.flash("errorAddProducts"),
   });
-});
+})
 
 router.post("/add-products", userMiddleware, async (req, res) => {
   const { title, description, image, price } = req.body;
@@ -50,6 +58,18 @@ router.post("/add-products", userMiddleware, async (req, res) => {
   }
   const products = await Product.create({...req.body, user: req.userId});
   res.redirect("/products");
-}); 
+});
+
+router.post("/edit-products/:id", userMiddleware, async (req, res) => {
+  const { title, description, image, price } = req.body;
+  const id = req.params.id;
+  if (!title || !description || !image || !price) {
+    req.flash("errorEditProducts", "All fields are required");
+    return res.redirect("/edit-products/" + id);
+  }
+
+  const product = await Product.findByIdAndUpdate(id, req.body, {new: true});
+  res.redirect("/products");
+});
 
 export default router;
