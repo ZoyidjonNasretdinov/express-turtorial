@@ -1,120 +1,95 @@
-// routes/authRoutes.js
-import express from "express";
-import User from "../models/User.js";
-import bcrypt from "bcryptjs";
-import { generateAuthToken } from "../services/token.js";
-import authMiddleware from "../middleware/auth.js";
+import {Router} from 'express'
+import User from '../models/User.js'
+import bcrypt from 'bcrypt'
+import {generateJWTToken} from '../services/token.js'
 
-const router = express.Router();
+const router = Router()
 
-// Render login page
-router.get("/login", (req, res) => {
-  if(req.cookies.token) {
-    res.redirect('/');
-    return 
-  }
-  res.render("login", {
-    title: "Login",
-    isLogin: true,
-    loginError: req.flash("loginError"),
-  });
-});
-
-// Render register page
-router.get("/register", (req, res) => {
-  if(req.cookies.token) {
-    res.redirect('/')
-    return
-  }
-  res.render("register", {
-    title: "Register | Zoyidjon",
-    isRegister: true,
-    registerError: req.flash("registerError"),
-  });
-});
-
-router.get('/logout', (req, res) => {
-  res.clearCookie('token');
-  res.redirect('/');
+router.get('/login', (req, res) => {
+	if (req.cookies.token) {
+		res.redirect('/')
+		return
+	}
+	res.render('login', {
+		title: 'Login | Sammi',
+		isLogin: true,
+		loginError: req.flash('loginError'),
+	})
 })
 
-// Handle login
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+router.get('/register', (req, res) => {
+	if (req.cookies.token) {
+		res.redirect('/')
+		return
+	}
+	res.render('register', {
+		title: 'Register | Sammi',
+		isRegister: true,
+		registerError: req.flash('registerError'),
+	})
+})
 
-  if (!email || !password) {
-    req.flash("loginError", "All fields are required");
-    return res.redirect("/login");
-  }
+router.get('/logout', (req, res) => {
+	res.clearCookie('token')
+	res.redirect('/')
+})
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      req.flash("loginError", "Invalid email or password");
-      return res.redirect("/login");
-    }
+router.post('/login', async (req, res) => {
+	const {email, password} = req.body
 
-    const token = generateAuthToken(user._id);
-    res.cookie("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 3600000, // 1 hour expiry time
-    });
+	if (!email || !password) {
+		req.flash('loginError', 'All fields is required')
+		res.redirect('/login')
+		return
+	}
 
-    req.flash("success", "Login successful");
-    res.redirect("/"); // Redirect to home page after login
-  } catch (err) {
-    console.error(err.message);
-    req.flash("loginError", "Something went wrong");
-    res.redirect("/login");
-  }
-});
+	const existUser = await User.findOne({email})
+	if (!existUser) {
+		req.flash('loginError', 'User not found')
+		res.redirect('/login')
+		return
+	}
 
-// Handle registration
-router.post("/register", async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+	const isPassEqual = await bcrypt.compare(password, existUser.password)
+	if (!isPassEqual) {
+		req.flash('loginError', 'Password wrong')
+		res.redirect('/login')
+		return
+	}
 
-  if (!firstName || !lastName || !email || !password) {
-    req.flash("registerError", "All fields are required");
-    return res.redirect("/register");
-  }
+	const token = generateJWTToken(existUser._id)
+	res.cookie('token', token, {httpOnly: true, secure: true})
+	res.redirect('/')
+})
 
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      req.flash("registerError", "Email is already registered");
-      return res.redirect("/register");
-    }
+router.post('/register', async (req, res) => {
+	const {firstname, lastname, email, password} = req.body
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-    });
+	if (!firstname || !lastname || !email || !password) {
+		req.flash('registerError', 'All fields is required')
+		res.redirect('/register')
+		return
+	}
 
-    await user.save();
+	const candidate = await User.findOne({email})
 
-    const token = generateAuthToken(user._id);
-    res.cookie("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 3600000, // 1 hour expiry time
-    });
+	if (candidate) {
+		req.flash('registerError', 'User already exist')
+		res.redirect('/register')
+		return
+	}
 
-    req.flash("success", "Registration successful");
-    res.redirect("/login");
-  } catch (err) {
-    console.error(err.message);
-    req.flash("registerError", "Something went wrong");
-    res.redirect("/register");
-  }
-});
+	const hashedPassword = await bcrypt.hash(password, 10)
+	const userData = {
+		firstName: firstname,
+		lastName: lastname,
+		email: email,
+		password: hashedPassword,
+	}
+	const user = await User.create(userData)
+	const token = generateJWTToken(user._id)
+	res.cookie('token', token, {httpOnly: true, secure: true})
+	res.redirect('/')
+})
 
-// Protecting a route that requires authentication
-router.get("/profile", authMiddleware, (req, res) => {
-  res.render("profile", { userId: req.userId });
-});
-
-export default router;
+export default router

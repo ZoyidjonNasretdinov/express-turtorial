@@ -1,6 +1,9 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
 
-export function generateAuthToken(userId) {
-  const secretKey = process.env.JWT_SECRET || "default_secret_key";
-  return jwt.sign({ id: userId }, secretKey, { expiresIn: "1h" });
+const generateJWTToken = userId => {
+	const accessToken = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: '30d'})
+
+	return accessToken
 }
+
+export {generateJWTToken}
